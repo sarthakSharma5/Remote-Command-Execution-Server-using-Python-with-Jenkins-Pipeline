@@ -1,3 +1,5 @@
+def TEST_STATUS_CODE = 0
+
 pipeline{
     agent any
 
@@ -26,9 +28,27 @@ sudo cp -rvf * /root/deployAPI/
         }
 
         stage("Testing"){
+            environment {
+                TEST_STATUS_CODE = 0
+            }
+
             steps{
                 echo "testing codes via docker"
+
+                sh '''
+if sudo docker ps -a | grep testweb
+then
+  sudo docker rm -f testweb
+fi
+sudo docker run -dit -p 85:80 -v /root/deployAPI:/usr/local/apache/htdocs --name testweb httpd
+                '''
             }
+
+            steps {
+                TEST_STATUS_CODE = sh(script: 'curl -o /dev/null -s -w "%{http_code}" -i 0.0.0.0:85', returnStdout: true).trim()
+                echo "${TEST_STATUS_CODE}"
+            }
+
             post{
                 always{
                     echo "testing complete"
