@@ -42,7 +42,7 @@ pipeline{
                     fi
                     sudo docker run -dit -p 85:80 -v /root/deployAPI:/var/www/html --name test-deploy-form sarthaksharma5/webapp:latest
                     sudo docker run -dit -p 90:80 -v /root/deployAPI:/var/www/cgi-bin --name test-deploy-api sarthaksharma5/api-webcgi:latest
-                    sudo docker exec test-deploy-api chmod +x /var/www/cgi-bin/*.py
+                    sudo docker exec test-deploy-api chmod +x /var/www/cgi-bin/cmdapi.py
                 '''
                 script{
                     // if SUCCESS then TEST_FORM_STATUS_CODE = 0 | i.e., sh returns 0 iff curl returns 200
@@ -131,7 +131,7 @@ pipeline{
                     pod_form=$(sudo kubectl get pods -l app=cmd-form -o jsonpath="{.items[0].metadata.name}")
                     sudo kubectl cp /root/deployAPI/*.html $pod_api:/var/www/html
                     sudo kubectl cp /root/deployAPI/*.py $pod_api:/var/www/cgi-bin
-                    sudo kubectl exec $pod_api -- chmod +x /var/www/cgi-bin/*.py 
+                    sudo kubectl exec $pod_api -- chmod +x /var/www/cgi-bin/cmdapi.py
                 '''
             }
             post{
