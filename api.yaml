@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-cmd-forms
+  labels:
+    app: api-linux
+spec:
+  type: NodePort
+  ports:
+    - protocol: TCP
+      nodePort: 31080   # range from 30000-32767
+      port: 80
+      targetPort: 80
+  selector:
+    app: cmd-app
+    tier: backend
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-cmd-api
+  labels:
+    app: cmd-api
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: cmd-api
+  labels:
+    app: cmd-app
+    tier: backend
+spec:
+  selector:
+    matchLabels:
+      app: cmd-api
+      tier: backend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: cmd-api
+        tier: backend
+    spec:
+      containers:
+      - image: vimal13/apache-webserver-php #sarthaksharma5/api-linux
+        name: cmd-api
+        ports:
+        - containerPort: 80
+          name: cmd-api-access
+        volumeMounts:
+        - name: cmd-api-volume
+          mountPath: "/var/www/cgi-bin"
+      volumes:
+      - name: cmd-api-volume
+        persistentVolumeClaim:
+          claimName: pvc-cmd-api
