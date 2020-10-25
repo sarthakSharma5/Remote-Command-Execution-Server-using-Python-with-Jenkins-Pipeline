@@ -42,7 +42,7 @@ pipeline{
                     fi
                     sudo docker run -dit -p 85:80 -v /root/deployAPI:/var/www/html --name test-deploy-form sarthaksharma5/webapp:latest
                     sudo docker run -dit -p 90:80 -v /root/deployAPI:/var/www/cgi-bin --name test-deploy-api sarthaksharma5/api-webcgi:latest
-                    sudo docker exec test-deploy-api chmod +x /var/www/cgi-bin/*.py
+                    sudo docker exec test-deploy-api chmod +x /var/www/cgi-bin/cmdapi.py
                 '''
                 script{
                     // if SUCCESS then TEST_FORM_STATUS_CODE = 0 | i.e., sh returns 0 iff curl returns 200
@@ -50,8 +50,10 @@ pipeline{
                     TEST_API_STATUS_CODE = sh returnStatus: true, script: 'curl -o /dev/null -s -w "%{http_code}" -i 0.0.0.0:90/cgi-bin/cmdapi.py?cmd=date'
                 }
                 sh '''
-                    sudo docker stop deploy-test-api
-                    sudo docker rm deploy-test-api
+                    sudo docker stop test-deploy-api
+                    sudo docker stop test-deploy-form
+                    sudo docker rm test-deploy-form
+                    sudo docker rm test-deploy-api
                 '''
             }
 
@@ -120,18 +122,18 @@ pipeline{
                     var=$(sudo kubectl get deploy cmd-api --ignore-not-found)
                     if [[ "$var" == "" ]]
                     then
-                        kubectl create -f /root/deployAPI/form.yml
-                        kubectl create -f /root/deployAPI/api.yml
+                        sudo kubectl create -f /root/deployAPI/form.yml
+                        sudo kubectl create -f /root/deployAPI/api.yml
                     else
-                        kubectl apply -f /root/deployAPI/form.yml
-                        kubectl apply -f /root/deployAPI/api.yml 
+                        sudo kubectl apply -f /root/deployAPI/form.yml
+                        sudo kubectl apply -f /root/deployAPI/api.yml 
                     fi
                     sleep 30
                     pod_api=$(sudo kubectl get pods -l app=cmd-api -o jsonpath="{.items[0].metadata.name}")
                     pod_form=$(sudo kubectl get pods -l app=cmd-form -o jsonpath="{.items[0].metadata.name}")
                     sudo kubectl cp /root/deployAPI/*.html $pod_api:/var/www/html
                     sudo kubectl cp /root/deployAPI/*.py $pod_api:/var/www/cgi-bin
-                    sudo kubectl exec $pod_api -- chmod +x /var/www/cgi-bin/*.py 
+                    sudo kubectl exec $pod_api -- chmod +x /var/www/cgi-bin/cmdapi.py
                 '''
             }
             post{
