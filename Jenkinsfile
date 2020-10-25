@@ -50,8 +50,10 @@ pipeline{
                     TEST_API_STATUS_CODE = sh returnStatus: true, script: 'curl -o /dev/null -s -w "%{http_code}" -i 0.0.0.0:90/cgi-bin/cmdapi.py?cmd=date'
                 }
                 sh '''
-                    sudo docker stop deploy-test-api
-                    sudo docker rm deploy-test-api
+                    sudo docker stop test-deploy-api
+                    sudo docker stop test-deploy-form
+                    sudo docker rm test-deploy-form
+                    sudo docker rm test-deploy-api
                 '''
             }
 
