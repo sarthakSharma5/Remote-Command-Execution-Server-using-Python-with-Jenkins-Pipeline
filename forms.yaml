@@ -38,14 +38,14 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: cmd-form
+      app: cmd-app
       tier: frontend
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: cmd-form
+        app: cmd-app
         tier: frontend
     spec:
       containers:

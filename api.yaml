@@ -38,14 +38,14 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: cmd-api
+      app: cmd-app
       tier: backend
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: cmd-api
+        app: cmd-app
         tier: backend
     spec:
       containers:
