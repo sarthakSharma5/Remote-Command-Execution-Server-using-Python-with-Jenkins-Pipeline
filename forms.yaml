@@ -61,6 +61,3 @@ spec:
       - name: cmd-form-volume
         persistentVolumeClaim:
           claimName: pvc-cmd-form
-      - name: cmd-form-volume
-        persistentVolumeClaim:
-          claimName: pvc-cmd-form
