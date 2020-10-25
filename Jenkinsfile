@@ -5,7 +5,7 @@ pipeline{
     agent any
     environment {
         DEV_EMAIL = 'sarthaksharma575@gmail.com'
-        ADMIN_EMAIL = 'sarthaksharma575@gmail.com'
+        ADMIN_EMAIL = 'sarthaksharma10022000@gmail.com'
     }
 
     stages{
@@ -19,7 +19,7 @@ pipeline{
                     else
                     sudo mkdir /root/deployAPI
                     fi
-                    sudo cp -rvf * /root/deployAPI/
+                    sudo cp -rvf *.html *.py *.yaml /root/deployAPI/
                 '''
             }
             post{
@@ -120,11 +120,11 @@ ${BUILD_LOG, maxLines=100, escapeHtml=false}
                     var=$(sudo kubectl get deploy cmd-api --ignore-not-found)
                     if [[ "$var" == "" ]]
                     then
-                        sudo kubectl create -f /root/deployAPI/form.yml
-                        sudo kubectl create -f /root/deployAPI/api.yml
+                        sudo kubectl create -f /root/deployAPI/forms.yaml
+                        sudo kubectl create -f /root/deployAPI/api.yaml
                     else
-                        sudo kubectl apply -f /root/deployAPI/form.yml
-                        sudo kubectl apply -f /root/deployAPI/api.yml 
+                        sudo kubectl apply -f /root/deployAPI/form.yaml
+                        sudo kubectl apply -f /root/deployAPI/api.yaml 
                     fi
                     sleep 30
                     pod_api=$(sudo kubectl get pods -l app=cmd-api -o jsonpath="{.items[0].metadata.name}")
@@ -139,7 +139,17 @@ ${BUILD_LOG, maxLines=100, escapeHtml=false}
                     echo 'Deployment success'
                 }
                 failure{
-                    echo 'Deployment failed'
+                    echo 'Deployment failed, mailing Admin ...'
+                    emailext body: '''
+Deployment failed: ISSUE with Kubernetes Cluster
+Last update by: ${DEV_EMAIL}
+Check console output to view the results.\n\n 
+${CHANGES}\n 
+--------------------------------------------------\n
+${BUILD_LOG, maxLines=100, escapeHtml=false}
+\n\nPipeline failure ''',
+                    to: "${ADMIN_EMAIL}",
+                    subject: 'Build FAILED in Jenkins: $PROJECT_NAME - #$BUILD_NUMBER'
                 }
             }
         }
@@ -159,6 +169,18 @@ ${BUILD_LOG, maxLines=100, escapeHtml=false}
 \n\nPipeline executed successfully ''',
                     to: "${ADMIN_EMAIL}",
                     subject: 'Build SUCCESS in Jenkins: $PROJECT_NAME - #$BUILD_NUMBER'
+        }
+        failure{
+            echo "Pipeline failed"
+            emailext body: '''
+Last update by: ${DEV_EMAIL}
+Check console output to view the results.\n\n 
+${CHANGES}\n 
+--------------------------------------------------\n
+${BUILD_LOG, maxLines=100, escapeHtml=false}
+\n\nPipeline executed successfully ''',
+                    to: "${ADMIN_EMAIL}",
+                    subject: 'Build FAILED in Jenkins: $PROJECT_NAME - #$BUILD_NUMBER'
         }
     }
 }

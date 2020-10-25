@@ -8,7 +8,7 @@ spec:
   type: NodePort
   ports:
     - protocol: TCP
-      nodePort: 31080   # range from 30000-32767
+      nodePort: 31090   # range from 30000-32767
       port: 80
       targetPort: 80
   selector:
