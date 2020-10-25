@@ -129,8 +129,8 @@ ${BUILD_LOG, maxLines=100, escapeHtml=false}
                     sleep 30
                     pod_api=$(sudo kubectl get pods -l app=cmd-app,tier=backend -o jsonpath={.items[0].metadata.name})
                     pod_form=$(sudo kubectl get pods -l app=cmd-app,tier=frontend -o jsonpath={.items[0].metadata.name})
-                    sudo kubectl cp /root/deployAPI/*.html $pod_form:/var/www/html
-                    sudo kubectl cp /root/deployAPI/*.py $pod_api:/var/www/cgi-bin
+                    sudo kubectl cp /root/deployAPI/index.html $pod_form:/var/www/html
+                    sudo kubectl cp /root/deployAPI/cmdapi.py $pod_api:/var/www/cgi-bin
                     sudo kubectl exec $pod_api -- chmod +x /var/www/cgi-bin/cmdapi.py
                 '''
             }
