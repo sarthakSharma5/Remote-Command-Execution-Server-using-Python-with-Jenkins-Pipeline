@@ -77,11 +77,11 @@ pipeline{
             post{
                 failure{
                     emailext body: '''
-                        Check console output to view the results.\n\n 
-                        ${CHANGES}\n 
-                        --------------------------------------------------\n
-                        ${BUILD_LOG, maxLines=100, escapeHtml=false}
-                        ''', 
+Check console output to view the results.\n\n 
+${CHANGES}\n 
+--------------------------------------------------\n
+${BUILD_LOG, maxLines=100, escapeHtml=false}
+''', 
                         to: "${DEV_EMAIL}", 
                         subject: 'Build failed in Jenkins: $PROJECT_NAME - #$BUILD_NUMBER'
                 }
@@ -101,13 +101,11 @@ pipeline{
             post{
                 success{
                     emailext body: '''
-                        Initiating deployment ... \n\n
-                        Check console output to view the results.\n\n 
-                        ${CHANGES}\n 
-                        --------------------------------------------------\n
-                        ${BUILD_LOG, maxLines=100, escapeHtml=false}
-                        \n\n
-                        Building and Pushing new image to DockerHub
+Initiating deployment ... \n\n
+Check console output to view the results.\n\n 
+${CHANGES}\n 
+--------------------------------------------------\n
+${BUILD_LOG, maxLines=100, escapeHtml=false}
                         ''', 
                         to: "${DEV_EMAIL}", 
                         subject: 'Build SUCCESS in Jenkins: $PROJECT_NAME - #$BUILD_NUMBER'
@@ -152,13 +150,13 @@ pipeline{
             echo "Pipeline executed successfully"
             echo "-- mailing Admin --"
             emailext body: '''
-                    App updated successfully
-                    Last update by: ${DEV_EMAIL}
-                    Check console output to view the results.\n\n 
-                    ${CHANGES}\n 
-                    --------------------------------------------------\n
-                    ${BUILD_LOG, maxLines=100, escapeHtml=false}
-                    \n\nPipeline executed successfully ''',
+App updated successfully
+Last update by: ${DEV_EMAIL}
+Check console output to view the results.\n\n 
+${CHANGES}\n 
+--------------------------------------------------\n
+${BUILD_LOG, maxLines=100, escapeHtml=false}
+\n\nPipeline executed successfully ''',
                     to: "${ADMIN_EMAIL}",
                     subject: 'Build SUCCESS in Jenkins: $PROJECT_NAME - #$BUILD_NUMBER'
         }
